@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASIC Network Docs</title>
+<meta name="description" content="Open documentation from the ASIC Network, rendered straight from markdown.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='5' y='5' width='22' height='22' rx='5' fill='%2303418a'/%3E%3Crect x='11' y='11' width='10' height='10' rx='2' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#03418a;
+  --navy-2:#022f64;
+  --ink:#0a1f3d;
+  --blue:#2f6fd6;
+  --soft:#eaf0fb;
+  --trace:#c2d4f0;
+  --line:#e3e9f3;
+  --bg:#ffffff;
+  --bg-alt:#f7f9fd;
+  --text:#31415c;
+  --muted:#6a7a96;
+  --font:'Archivo',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --maxw:1200px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+button{font:inherit}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:70;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .row{max-width:var(--maxw);margin:0 auto;padding:0 clamp(18px,4vw,32px);display:flex;align-items:center;gap:18px;height:64px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;margin-right:auto}
+.brand .chip{flex:none;transition:transform .3s ease}
+.brand:hover .chip{transform:rotate(45deg)}
+.chip .pins{stroke:var(--navy);stroke-width:2;stroke-linecap:round}
+.chip .body{fill:var(--navy)}
+.chip .core{fill:#fff;opacity:.92}
+.brand .wm{font-weight:800;font-size:1.0rem;letter-spacing:.04em;color:var(--ink);line-height:1.15;display:block}
+.brand .sub{font-family:var(--mono);font-size:.56rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;display:block}
+.links{display:flex;align-items:center;gap:4px}
+.links a{position:relative;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text);text-decoration:none;padding:8px 11px;border-radius:7px;transition:color .15s}
+.links a:hover{color:var(--navy)}
+.links a::after{content:"";position:absolute;left:11px;right:11px;bottom:4px;height:1.5px;background:var(--navy);transform:scaleX(0);transform-origin:left;transition:transform .22s ease}
+.links a:hover::after{transform:scaleX(1)}
+.scrollbar{position:absolute;left:0;bottom:-1px;width:100%;height:2px;pointer-events:none}
+.scrollbar span{display:block;height:100%;background:var(--navy);transform:scaleX(0);transform-origin:left}
+
+/* ---------- mobile toolbar ---------- */
+.toolbar{display:none;position:sticky;top:64px;z-index:60;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px clamp(18px,4vw,32px);align-items:center;gap:12px}
+.tb-btn{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);background:var(--soft);border:1px solid var(--trace);border-radius:8px;padding:8px 12px;cursor:pointer}
+.tb-title{font-weight:600;font-size:.86rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:232px minmax(0,1fr) 196px;gap:clamp(24px,3.5vw,44px);padding:34px clamp(18px,4vw,32px) 70px;max-width:var(--maxw);margin:0 auto}
+.sidebar h3,.toc h3{font-family:var(--mono);font-size:.64rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.sidebar{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 112px);overflow:auto;padding-right:6px}
+#page-nav{display:flex;flex-direction:column;gap:3px}
+#page-nav a{display:flex;align-items:baseline;gap:10px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--text);font-size:.87rem;font-weight:500;line-height:1.35;transition:background .14s,color .14s}
+#page-nav a .pn{font-family:var(--mono);font-size:.58rem;font-weight:600;color:var(--navy);background:var(--soft);border:1px solid var(--trace);border-radius:4px;padding:1px 5px;flex:none}
+#page-nav a:hover{background:var(--bg-alt);color:var(--ink)}
+#page-nav a.active{background:var(--soft);color:var(--ink);font-weight:600;box-shadow:inset 2px 0 0 var(--navy)}
+.side-note{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;line-height:1.8;color:var(--muted);border-top:1px dashed var(--line);margin-top:18px;padding-top:12px}
+
+.toc{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 112px);overflow:auto}
+#toc-nav{display:flex;flex-direction:column;gap:2px;border-left:1.5px solid var(--line)}
+#toc-nav a{font-size:.78rem;color:var(--muted);text-decoration:none;padding:4px 0 4px 14px;margin-left:-1.5px;border-left:1.5px solid transparent;line-height:1.4;transition:color .14s,border-color .14s}
+#toc-nav a.t-h3{padding-left:26px;font-size:.73rem}
+#toc-nav a:hover{color:var(--ink)}
+#toc-nav a.active{color:var(--navy);font-weight:600;border-left-color:var(--navy)}
+
+/* ---------- doc meta + pager ---------- */
+.doc-meta{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.doc-meta .pgno{font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--navy)}
+.doc-meta .edit{margin-left:auto;font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .14s}
+.doc-meta .edit:hover{color:var(--navy)}
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:52px}
+.pg{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;background:#fff;transition:transform .16s,border-color .16s,box-shadow .16s}
+.pg:hover{transform:translateY(-2px);border-color:#cdd9ef;box-shadow:0 14px 30px -22px rgba(3,65,138,.45)}
+.pg span{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pg b{color:var(--ink);font-size:.92rem;font-weight:700}
+.pg.next{text-align:right;align-items:flex-end}
+
+/* ---------- markdown ---------- */
+.md{min-height:300px}
+.md>:first-child{margin-top:0}
+.md h1{font-weight:800;font-size:clamp(1.85rem,3.6vw,2.55rem);line-height:1.08;letter-spacing:-.02em;color:var(--ink);margin:0 0 .55em;padding-bottom:.45em;border-bottom:1px solid var(--line)}
+.md h2{font-weight:800;font-size:1.42rem;letter-spacing:-.01em;color:var(--ink);margin:2em 0 .6em}
+.md h3{font-weight:700;font-size:1.1rem;color:var(--ink);margin:1.7em 0 .5em}
+.md h4{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--navy);margin:1.6em 0 .5em}
+.md h5,.md h6{font-weight:700;font-size:.92rem;color:var(--ink);margin:1.4em 0 .4em}
+.md :is(h1,h2,h3,h4,h5,h6){scroll-margin-top:96px}
+.md .hlink{opacity:0;margin-left:9px;color:var(--trace);text-decoration:none;font-weight:600;border:0;transition:opacity .15s,color .15s}
+.md :is(h1,h2,h3,h4,h5,h6):hover .hlink{opacity:1}
+.md .hlink:hover{color:var(--navy)}
+.md p{margin:.9em 0;line-height:1.78;font-size:.98rem}
+.md a{color:var(--navy);text-decoration:none;border-bottom:1px solid var(--trace);transition:border-color .14s}
+.md a:hover{border-bottom-color:var(--navy)}
+.md strong{color:var(--ink);font-weight:700}
+.md del{color:var(--muted)}
+.md code{font-family:var(--mono);font-size:.84em;background:var(--soft);border:1px solid var(--trace);border-radius:5px;padding:.08em .38em;color:var(--navy-2)}
+.md ul,.md ol{margin:.9em 0;padding-left:1.45em}
+.md li{margin:.4em 0;line-height:1.7;font-size:.98rem}
+.md li::marker{color:var(--navy);font-weight:600}
+.md li.task{list-style:none;margin-left:-1.45em;display:flex;align-items:baseline;gap:9px}
+.md li.task input{accent-color:var(--navy);transform:translateY(1px)}
+.md ul ul,.md ol ol,.md ul ol,.md ol ul{margin:.35em 0}
+.md blockquote{margin:1.4em 0;padding:6px 20px;border-left:3px solid var(--navy);background:var(--soft);border-radius:0 12px 12px 0}
+.md blockquote p{font-size:.94rem}
+.md hr{border:0;height:1px;background:linear-gradient(90deg,var(--line),transparent);margin:2.4em 0}
+.codeblock{margin:1.5em 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.codeblock figcaption{display:flex;align-items:center;gap:9px;padding:9px 14px;background:var(--soft);border-bottom:1px solid var(--line)}
+.codeblock .dot{width:7px;height:7px;border-radius:50%;background:var(--navy);animation:dotpulse 2.4s ease-in-out infinite}
+.codeblock .lang{font-family:var(--mono);font-size:.6rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--navy)}
+.codeblock .copy{margin-left:auto;font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 9px;cursor:pointer;transition:color .14s,border-color .14s}
+.codeblock .copy:hover{color:var(--navy);border-color:var(--trace)}
+.codeblock pre{padding:16px 18px;overflow:auto;background:#fbfcff}
+.codeblock pre code{font-family:var(--mono);font-size:.82rem;line-height:1.7;color:var(--ink);background:none;border:0;padding:0}
+.tablewrap{margin:1.5em 0;border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+.md table{width:100%;border-collapse:collapse;font-size:.9rem}
+.md th{font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);background:var(--soft);padding:11px 15px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.md td{padding:10px 15px;border-bottom:1px solid var(--line);line-height:1.6}
+.md tbody tr:last-child td{border-bottom:0}
+.md tbody tr:nth-child(even){background:#fafcff}
+figure.img{margin:1.7em 0}
+figure.img img{border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 40px -30px rgba(3,65,138,.4)}
+figure.img figcaption{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:9px}
+
+/* ---------- states ---------- */
+@keyframes skshimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+.sk{height:12px;border-radius:6px;background:linear-gradient(90deg,var(--soft) 25%,#f1f4fb 37%,var(--soft) 63%);background-size:400% 100%;animation:skshimmer 1.4s ease-in-out infinite;margin:10px 0}
+.state-card{border:1px dashed var(--trace);border-radius:14px;padding:30px;background:var(--bg-alt)}
+.state-card h2{border:0;padding:0;margin:0 0 10px;font-size:1.15rem}
+.state-card p{font-size:.9rem;color:var(--muted)}
+@keyframes dotpulse{0%,100%{box-shadow:0 0 0 3px rgba(3,65,138,.16)}50%{box-shadow:0 0 0 7px rgba(3,65,138,.04)}}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:26px 0;background:var(--bg-alt)}
+footer .row{max-width:var(--maxw);margin:0 auto;padding:0 clamp(18px,4vw,32px);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+footer .wm{font-weight:800;color:var(--ink);letter-spacing:.03em;font-size:.92rem}
+footer .tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+footer a{margin-left:auto;color:var(--text);text-decoration:none;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;transition:color .14s}
+footer a:hover{color:var(--navy)}
+
+/* ---------- drawer ---------- */
+.backdrop{position:fixed;inset:0;background:rgba(10,31,61,.35);z-index:64;opacity:0;pointer-events:none;transition:opacity .2s}
+body.drawer-open .backdrop{opacity:1;pointer-events:auto}
+
+@media(max-width:1120px){
+  .toc{display:none}
+  .layout{grid-template-columns:232px minmax(0,1fr)}
+}
+@media(max-width:880px){
+  .layout{grid-template-columns:1fr;padding-top:24px}
+  .toolbar{display:flex}
+  .sidebar{position:fixed;top:64px;bottom:0;left:0;width:min(310px,85vw);background:#fff;z-index:66;padding:22px 20px;transform:translateX(-103%);transition:transform .24s ease;border-right:1px solid var(--line);max-height:none;box-shadow:0 20px 60px rgba(3,65,138,.25)}
+  body.drawer-open .sidebar{transform:none}
+  .pager{grid-template-columns:1fr}
+  .pg.next{text-align:left;align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="row">
+    <a class="brand" id="nav-home" href="#">
+      <svg class="chip" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+        <g class="pins">
+          <path d="M10 5V2M16 5V2M22 5V2M10 27v3M16 27v3M22 27v3M5 10H2M5 16H2M5 22H2M27 10h3M27 16h3M27 22h3"/>
+        </g>
+        <rect class="body" x="5" y="5" width="22" height="22" rx="4"/>
+        <rect class="core" x="11" y="11" width="10" height="10" rx="2"/>
+      </svg>
+      <span>
+        <span class="wm">ASIC NETWORK</span>
+        <span class="sub" id="brand-sub">docs</span>
+      </span>
+    </a>
+    <nav class="links">
+      <a id="nav-main" href="#">Home</a>
+      <a id="nav-repo" href="#" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+  <div class="scrollbar"><span id="progress"></span></div>
+</header>
+
+<div class="toolbar">
+  <button id="drawer-btn" class="tb-btn" type="button">&#9776; Pages</button>
+  <span class="tb-title" id="tb-title">Loading&hellip;</span>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <h3>Pages</h3>
+    <nav id="page-nav">
+      <div class="sk" style="width:82%"></div>
+      <div class="sk" style="width:64%"></div>
+      <div class="sk" style="width:74%"></div>
+    </nav>
+    <p class="side-note">pages are read from page_N.md in the repo root. the first # heading names the tab.</p>
+  </aside>
+
+  <main>
+    <div class="doc-meta" id="doc-meta" style="display:none"></div>
+    <article class="md" id="content">
+      <div class="sk" style="width:55%;height:30px"></div>
+      <div class="sk" style="width:95%"></div>
+      <div class="sk" style="width:88%"></div>
+      <div class="sk" style="width:92%"></div>
+      <div class="sk" style="width:40%"></div>
+    </article>
+    <nav class="pager" id="pager"></nav>
+  </main>
+
+  <aside class="toc" id="toc">
+    <h3>On this page</h3>
+    <nav id="toc-nav"></nav>
+  </aside>
+</div>
+
+<footer>
+  <div class="row">
+    <span class="wm">ASIC NETWORK</span>
+    <span class="tag">// silicon is a team sport</span>
+    <a id="f-repo" href="#" target="_blank" rel="noopener">Contribute on GitHub &nearr;</a>
+  </div>
+</footer>
+
+<noscript><div style="max-width:700px;margin:30px auto;padding:0 24px;font-family:monospace">This site renders markdown client-side and needs JavaScript enabled.</div></noscript>
+
+<script>
+/* =========================================================
+   CONFIG: edit these two strings per repo, nothing else
+   ========================================================= */
+const CONFIG = {
+  title: "Digital Tutorials",                                    // EDIT: "Analog Tutorials" / "Digital Tutorials"
+  repo:  "https://github.com/ASIC-Network/digital-tutorials",    // EDIT: this repo's github url
+  mainSite: "https://asicnetwork.net",
+  branch: "main",
+  maxPages: 60
+};
+
+/* ---------- dom refs + boilerplate ---------- */
+const $id = s => document.getElementById(s);
+const content = $id("content"), pageNav = $id("page-nav"), pager = $id("pager"),
+      metaEl = $id("doc-meta"), tocNav = $id("toc-nav"), tocBox = $id("toc"),
+      tbTitle = $id("tb-title");
+
+document.title = CONFIG.title + " \u00b7 ASIC Network";
+$id("brand-sub").textContent = CONFIG.title;
+$id("nav-home").href = CONFIG.mainSite;
+$id("nav-main").href = CONFIG.mainSite;
+$id("nav-repo").href = CONFIG.repo;
+$id("f-repo").href = CONFIG.repo;
+
+/* scroll progress */
+(function(){
+  const bar = $id("progress");
+  function upd(){
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    bar.style.transform = "scaleX(" + (max > 0 ? h.scrollTop / max : 0) + ")";
+  }
+  addEventListener("scroll", upd, { passive: true });
+  addEventListener("resize", upd);
+  upd();
+})();
+
+/* drawer */
+(function(){
+  const body = document.body;
+  $id("drawer-btn").addEventListener("click", () => body.classList.toggle("drawer-open"));
+  $id("backdrop").addEventListener("click", () => body.classList.remove("drawer-open"));
+  pageNav.addEventListener("click", e => { if (e.target.closest("a")) body.classList.remove("drawer-open"); });
+})();
+
+/* =========================================================
+   markdown renderer
+   headers, emphasis, code, lists, tasks, tables, quotes,
+   images, links, hr. raw HTML is escaped, comments stripped.
+   ========================================================= */
+/*__MD_START__*/
+var slugCounts = Object.create(null);
+function resetSlugs(){ slugCounts = Object.create(null); }
+var ESC_MAP = {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"};
+function escHtml(s){ return String(s).replace(/[&<>"']/g, function(m){ return ESC_MAP[m]; }); }
+function slug(text){
+  var s = text.toLowerCase().replace(/`/g,"").replace(/[^a-z0-9\u00c0-\u024f]+/g,"-").replace(/^-+|-+$/g,"") || "section";
+  var n = slugCounts[s] || 0; slugCounts[s] = n + 1;
+  return n ? s + "-" + n : s;
+}
+function emphasize(s){
+  s = s.replace(/\*\*\*([^*]+)\*\*\*/g,"<strong><em>$1</em></strong>");
+  s = s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  s = s.replace(/(^|[^\w*])\*([^*\n]+)\*(?![\w*])/g,"$1<em>$2</em>");
+  s = s.replace(/(^|[^\w_])_([^_\n]+)_(?![\w_])/g,"$1<em>$2</em>");
+  s = s.replace(/~~([^~]+)~~/g,"<del>$1</del>");
+  return s;
+}
+function inline(raw){
+  var stash = [];
+  function keep(h){ stash.push(h); return "\u0001" + (stash.length - 1) + "\u0001"; }
+  var s = escHtml(raw);
+  s = s.replace(/`([^`]+)`/g, function(m,c){ return keep("<code>" + c + "</code>"); });
+  s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;[^&]*&quot;)?\)/g, function(m,alt,src){
+    return keep('<img src="' + src + '" alt="' + alt + '" loading="lazy">');
+  });
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+&quot;[^&]*&quot;)?\)/g, function(m,t,u){
+    var pm = u.match(/^page[_-]?(\d+)\.md$/i);
+    var href = pm ? "#page_" + pm[1] : u;
+    var ext = /^https?:/i.test(href);
+    return keep('<a href="' + href + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + ">" + emphasize(t) + "</a>");
+  });
+  s = emphasize(s);
+  s = s.replace(/\u0001(\d+)\u0001/g, function(m,i){ return stash[+i]; });
+  return s;
+}
+function splitRow(row){
+  var r = row.trim();
+  if (r.charAt(0) === "|") r = r.slice(1);
+  if (r.charAt(r.length - 1) === "|") r = r.slice(0, -1);
+  return r.split("|").map(function(c){ return c.trim(); });
+}
+function buildList(items){
+  var html = "", stack = [], prev = -1;
+  items.forEach(function(it){
+    var lvl = Math.min(5, Math.floor(it.ind / 2));
+    if (lvl > prev){
+      for (var k = prev; k < lvl; k++){ html += it.ord ? "<ol>" : "<ul>"; stack.push(it.ord); }
+    } else {
+      html += "</li>";
+      for (var k2 = lvl; k2 < prev; k2++){ html += (stack.pop() ? "</ol>" : "</ul>") + "</li>"; }
+      if (stack.length && stack[stack.length - 1] !== it.ord){
+        html += stack.pop() ? "</ol>" : "</ul>";
+        html += it.ord ? "<ol>" : "<ul>";
+        stack.push(it.ord);
+      }
+    }
+    var t = it.txt.join(" ");
+    var task = t.match(/^\[([ xX])\]\s+(.*)$/);
+    html += task
+      ? '<li class="task"><input type="checkbox" disabled' + (/x/i.test(task[1]) ? " checked" : "") + "><span>" + inline(task[2]) + "</span>"
+      : "<li>" + inline(t);
+    prev = lvl;
+  });
+  html += "</li>";
+  while (stack.length){ html += stack.pop() ? "</ol>" : "</ul>"; if (stack.length) html += "</li>"; }
+  return html;
+}
+function mdToHtml(src){
+  src = String(src).replace(/^\uFEFF/,"").replace(/\r\n?/g,"\n").replace(/\t/g,"  ").replace(/<!--[\s\S]*?-->/g,"");
+  var lines = src.split("\n"), out = [], para = [], i = 0;
+  function flush(){ if (para.length){ out.push("<p>" + inline(para.join(" ")) + "</p>"); para = []; } }
+  while (i < lines.length){
+    var line = lines[i];
+
+    var fence = line.match(/^\s*```(.*)$/);
+    if (fence){
+      flush();
+      var lang = fence[1].trim(), buf = []; i++;
+      while (i < lines.length && !/^\s*```\s*$/.test(lines[i])){ buf.push(lines[i]); i++; }
+      i++;
+      out.push('<figure class="codeblock"><figcaption><span class="dot"></span><span class="lang">' + escHtml(lang || "code")
+        + '</span><button type="button" class="copy">copy</button></figcaption><pre><code>' + escHtml(buf.join("\n")) + "</code></pre></figure>");
+      continue;
+    }
+
+    if (/^\s*$/.test(line)){ flush(); i++; continue; }
+
+    var h = line.match(/^(#{1,6})\s+(.*)$/);
+    if (h){
+      flush();
+      var lvl = h[1].length, txt = h[2].replace(/\s+#+\s*$/,"").trim(), hid = slug(txt);
+      out.push("<h" + lvl + ' id="' + hid + '">' + inline(txt) + '<a class="hlink" href="#' + hid + '" aria-hidden="true">#</a></h' + lvl + ">");
+      i++; continue;
+    }
+
+    /* table before hr so |---|---| separators are not eaten */
+    if (line.indexOf("|") !== -1 && i + 1 < lines.length && lines[i+1].indexOf("|") !== -1
+        && /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i+1]) && lines[i+1].indexOf("-") !== -1){
+      flush();
+      var head = splitRow(line);
+      var aligns = splitRow(lines[i+1]).map(function(c){
+        var al = /^:/.test(c), ar = /:$/.test(c);
+        return al && ar ? "center" : ar ? "right" : "";
+      });
+      i += 2;
+      var rows = [];
+      while (i < lines.length && lines[i].indexOf("|") !== -1 && !/^\s*$/.test(lines[i])){ rows.push(splitRow(lines[i])); i++; }
+      var alAttr = function(k){ return aligns[k] ? ' style="text-align:' + aligns[k] + '"' : ""; };
+      out.push('<div class="tablewrap"><table><thead><tr>'
+        + head.map(function(c,k){ return "<th" + alAttr(k) + ">" + inline(c) + "</th>"; }).join("")
+        + "</tr></thead><tbody>"
+        + rows.map(function(r){ return "<tr>" + head.map(function(_,k){ return "<td" + alAttr(k) + ">" + inline(r[k] || "") + "</td>"; }).join("") + "</tr>"; }).join("")
+        + "</tbody></table></div>");
+      continue;
+    }
+
+    if (/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line)){ flush(); out.push("<hr>"); i++; continue; }
+
+    if (/^\s*>/.test(line)){
+      flush();
+      var qbuf = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])){ qbuf.push(lines[i].replace(/^\s*>\s?/,"")); i++; }
+      out.push("<blockquote>" + mdToHtml(qbuf.join("\n")) + "</blockquote>");
+      continue;
+    }
+
+    var isLi = line.match(/^(\s*)([-*+]|\d+[.)])\s+(.*)$/);
+    if (isLi){
+      flush();
+      var items = [];
+      while (i < lines.length){
+        var m = lines[i].match(/^(\s*)([-*+]|\d+[.)])\s+(.*)$/);
+        if (m){ items.push({ ind: m[1].length, ord: /^\d/.test(m[2]), txt: [m[3]] }); i++; }
+        else if (/^\s*$/.test(lines[i])){
+          if (i + 1 < lines.length && /^(\s*)([-*+]|\d+[.)])\s+/.test(lines[i+1])) i++;
+          else break;
+        }
+        else if (/^\s{2,}\S/.test(lines[i]) && items.length){ items[items.length - 1].txt.push(lines[i].trim()); i++; }
+        else break;
+      }
+      out.push(buildList(items));
+      continue;
+    }
+
+    var img = line.match(/^\s*!\[([^\]]*)\]\((\S+?)(?:\s+"([^"]*)")?\)\s*$/);
+    if (img){
+      flush();
+      var cap = img[3] || img[1];
+      out.push('<figure class="img"><img src="' + escHtml(img[2]) + '" alt="' + escHtml(img[1]) + '" loading="lazy">'
+        + (cap ? "<figcaption>" + escHtml(cap) + "</figcaption>" : "") + "</figure>");
+      i++; continue;
+    }
+
+    para.push(line.trim()); i++;
+  }
+  flush();
+  return out.join("\n");
+}
+/*__MD_END__*/
+
+/* ---------- page discovery ---------- */
+function titleOf(src, n){
+  var m = String(src).replace(/\r/g,"").match(/^#\s+(.+)$/m);
+  return m ? m[1].replace(/\s+#+\s*$/,"").trim() : "Page " + n;
+}
+async function discoverPages(){
+  const pages = [];
+  const B = 6;
+  for (let s = 1; s <= CONFIG.maxPages; s += B){
+    const ns = [];
+    for (let k = 0; k < B && s + k <= CONFIG.maxPages; k++) ns.push(s + k);
+    const got = await Promise.all(ns.map(n =>
+      fetch("page_" + n + ".md", { cache: "no-store" })
+        .then(r => r.ok ? r.text() : null)
+        .catch(() => null)));
+    let gap = false;
+    got.forEach((txt, k) => {
+      if (gap) return;
+      if (txt == null){ gap = true; return; }
+      pages.push({ n: ns[k], src: txt, title: titleOf(txt, ns[k]) });
+    });
+    if (gap) break;
+  }
+  return pages;
+}
+
+/* ---------- rendering ---------- */
+let PAGES = [];
+const pad = n => String(n).padStart(2, "0");
+
+function renderNav(active){
+  pageNav.innerHTML = PAGES.map((p, k) =>
+    '<a href="#page_' + p.n + '"' + (k === active ? ' class="active"' : '') + '>'
+    + '<span class="pn">' + pad(p.n) + '</span><span>' + escHtml(p.title) + '</span></a>').join("");
+}
+function renderPager(k){
+  const prev = PAGES[k - 1], next = PAGES[k + 1];
+  pager.innerHTML =
+    (prev ? '<a class="pg prev" href="#page_' + prev.n + '"><span>&larr; Previous</span><b>' + escHtml(prev.title) + "</b></a>" : "<span></span>")
+    + (next ? '<a class="pg next" href="#page_' + next.n + '"><span>Next &rarr;</span><b>' + escHtml(next.title) + "</b></a>" : "<span></span>");
+}
+let spy = null;
+function buildToc(){
+  const hs = Array.from(content.querySelectorAll("h2, h3"));
+  tocBox.style.display = hs.length ? "" : "none";
+  tocNav.innerHTML = hs.map(h => {
+    const c = h.cloneNode(true);
+    const a = c.querySelector(".hlink"); if (a) a.remove();
+    return '<a class="t-' + h.tagName.toLowerCase() + '" href="#' + h.id + '">' + escHtml(c.textContent.trim()) + "</a>";
+  }).join("");
+  if (spy) spy.disconnect();
+  if (!("IntersectionObserver" in window) || !hs.length) return;
+  const links = tocNav.querySelectorAll("a");
+  spy = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (e.isIntersecting){
+        links.forEach(l => l.classList.toggle("active", l.getAttribute("href") === "#" + e.target.id));
+      }
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  hs.forEach(h => spy.observe(h));
+}
+function bindCopy(){
+  content.querySelectorAll(".codeblock .copy").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const code = btn.closest(".codeblock").querySelector("code").textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(code).then(() => {
+          btn.textContent = "copied";
+          setTimeout(() => { btn.textContent = "copy"; }, 1400);
+        });
+      }
+    });
+  });
+}
+function renderPage(k){
+  const p = PAGES[k];
+  resetSlugs();
+  content.innerHTML = mdToHtml(p.src);
+  document.title = p.title + " \u00b7 " + CONFIG.title;
+  tbTitle.textContent = p.title;
+  metaEl.style.display = "";
+  metaEl.innerHTML = '<span class="pgno">Page ' + pad(p.n) + " / " + pad(PAGES[PAGES.length - 1].n) + "</span>"
+    + '<a class="edit" target="_blank" rel="noopener" href="' + CONFIG.repo + "/edit/" + CONFIG.branch + "/page_" + p.n + '.md">edit this page on github &nearr;</a>';
+  renderNav(k); renderPager(k); buildToc(); bindCopy();
+  try { window.scrollTo(0, 0); } catch (e) {}
+}
+function renderEmpty(){
+  const isFile = location.protocol === "file:";
+  pageNav.innerHTML = "";
+  metaEl.style.display = "none";
+  tocBox.style.display = "none";
+  tbTitle.textContent = "No pages";
+  content.innerHTML = '<div class="state-card"><h2>No pages found</h2>'
+    + "<p>This site renders <code>page_1.md</code>, <code>page_2.md</code>, &hellip; from the repo root. Add <code>page_1.md</code> (copy <code>TEMPLATE.md</code>) and reload. Numbering must be sequential with no gaps.</p>"
+    + (isFile ? "<p>You opened this file directly. <code>fetch()</code> needs a server: run <code>python3 -m http.server</code> in this folder and open <code>http://localhost:8000</code>.</p>" : "")
+    + "</div>";
+}
+
+/* ---------- routing ---------- */
+function idxFromHash(){
+  const m = location.hash.match(/^#page[_-](\d+)$/i);
+  if (!m) return 0;
+  const k = PAGES.findIndex(p => p.n === +m[1]);
+  return k >= 0 ? k : 0;
+}
+addEventListener("hashchange", () => {
+  const m = location.hash.match(/^#page[_-](\d+)$/i);
+  if (m && PAGES.length){
+    const k = PAGES.findIndex(p => p.n === +m[1]);
+    if (k >= 0) renderPage(k);
+  }
+  /* any other hash is an in-page anchor; the browser handles it */
+});
+
+(async function init(){
+  PAGES = await discoverPages();
+  if (!PAGES.length){ renderEmpty(); return; }
+  renderPage(idxFromHash());
+  if (location.hash && !/^#page[_-]\d+$/i.test(location.hash)){
+    const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (el && el.scrollIntoView) el.scrollIntoView();
+  }
+})();
+</script>
+</body>
+</html>
